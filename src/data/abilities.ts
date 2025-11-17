@@ -1,0 +1,85 @@
+import { Ability } from '../types/game';
+
+export const ABILITIES: Ability[] = [
+  {
+    id: 'double_jump',
+    name: 'Double Jump',
+    description: 'Jump again while in mid-air',
+    price: 200,
+    unlocked: false,
+    type: 'passive',
+    effect: {
+      type: 'double_jump',
+      value: 1,
+    },
+  },
+  {
+    id: 'dash',
+    name: 'Dash',
+    description: 'Quick dash to evade attacks',
+    price: 250,
+    unlocked: false,
+    type: 'active',
+    cooldown: 3000,
+    effect: {
+      type: 'dash',
+      value: 15,
+      duration: 200,
+    },
+  },
+  {
+    id: 'damage_boost',
+    name: 'Power Strike',
+    description: '+50% damage for 10 seconds',
+    price: 300,
+    unlocked: false,
+    type: 'active',
+    cooldown: 15000,
+    effect: {
+      type: 'damage_boost',
+      value: 1.5,
+      duration: 10000,
+    },
+  },
+  {
+    id: 'shield',
+    name: 'Shield',
+    description: 'Block next hit',
+    price: 350,
+    unlocked: false,
+    type: 'active',
+    cooldown: 20000,
+    effect: {
+      type: 'shield',
+      value: 1,
+      duration: 5000,
+    },
+  },
+  {
+    id: 'quick_heal',
+    name: 'Quick Heal',
+    description: 'Instantly heal 30 HP',
+    price: 400,
+    unlocked: false,
+    type: 'active',
+    cooldown: 30000,
+    effect: {
+      type: 'heal',
+      value: 30,
+    },
+  },
+  {
+    id: 'speed_boost',
+    name: 'Speed Boost',
+    description: '+100% movement speed for 8 seconds',
+    price: 250,
+    unlocked: false,
+    type: 'active',
+    cooldown: 12000,
+    effect: {
+      type: 'speed_boost',
+      value: 2.0,
+      duration: 8000,
+    },
+  },
+];
