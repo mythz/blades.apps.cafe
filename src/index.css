@@ -386,3 +386,210 @@ body {
 .shop-modal::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Stats Screen */
+.stats-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.stats-screen {
+  background: rgba(20, 20, 20, 0.95);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.7);
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.stats-screen h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+  border-color: #667eea;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #AAA;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.stat-value.win-streak {
+  color: #FF6B6B;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.stat-value.perfect {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.stat-value.combo {
+  color: #00FF00;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.stat-value.coins {
+  color: #FFD700;
+}
+
+/* Tutorial Overlay */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.tutorial-panel {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 3px solid #FFD700;
+}
+
+.tutorial-panel h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #FFD700;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tutorial-section {
+  margin-bottom: 1.5rem;
+}
+
+.tutorial-section h3 {
+  font-size: 1.5rem;
+  color: #FFA500;
+  margin-bottom: 0.75rem;
+}
+
+.tutorial-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.tutorial-section li {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.tutorial-section li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: #FFD700;
+}
+
+.tutorial-section strong {
+  color: #FFD700;
+}
+
+.tutorial-section .highlight {
+  color: #00FF00;
+  font-weight: bold;
+}
+
+/* Game Over Enhancements */
+.perfect-win {
+  font-size: 1.8rem;
+  color: #FFD700;
+  margin: 1rem 0;
+  animation: pulse 1s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+.combo-info, .streak-info {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.combo-info {
+  color: #00FF00;
+}
+
+.streak-info {
+  color: #FF6B6B;
+}
+
+.streak-broken {
+  font-size: 1rem;
+  color: #999;
+  margin: 1rem 0;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Main Menu Enhancements */
+.coin-bonus {
+  font-size: 0.9rem;
+  color: #FFD700;
+  font-weight: normal;
+}
+
+.win-streak-indicator {
+  font-size: 1.2rem;
+  color: #FF6B6B;
+  margin-top: 0.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}

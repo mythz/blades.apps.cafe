@@ -1,9 +1,11 @@
 import { useGameContext } from '../../store/GameContext';
-import { GAME } from '../../utils/constants';
+import { DIFFICULTY_BONUSES } from '../../utils/constants';
 
 export function GameOverScreen() {
   const { state, dispatch } = useGameContext();
   const isVictory = state.winner === 'player';
+  const coinsEarned = isVictory ? (DIFFICULTY_BONUSES[state.difficulty] || 50) : 0;
+  const isPerfect = isVictory && state.player.health === state.player.maxHealth;
 
   const handlePlayAgain = () => {
     dispatch({ type: 'START_GAME', difficulty: state.difficulty });
@@ -16,7 +18,15 @@ export function GameOverScreen() {
           {isVictory ? 'VICTORY!' : 'DEFEAT!'}
         </h1>
         {isVictory && (
-          <p className="coins-earned">+{GAME.COINS_PER_WIN} Coins Earned!</p>
+          <>
+            <p className="coins-earned">+{coinsEarned} Coins Earned!</p>
+            {isPerfect && <p className="perfect-win">⭐ PERFECT WIN! ⭐</p>}
+            {state.maxCombo > 1 && <p className="combo-info">Max Combo: {state.maxCombo}x</p>}
+            {state.winStreak > 0 && <p className="streak-info">🔥 {state.winStreak} Win Streak!</p>}
+          </>
+        )}
+        {!isVictory && state.winStreak > 0 && (
+          <p className="streak-broken">Streak broken at {state.winStreak}</p>
         )}
         <p className="total-coins">Total Coins: {state.coins}</p>
         <div className="menu-buttons">

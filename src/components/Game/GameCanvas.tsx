@@ -4,11 +4,11 @@ import { useGameLoop } from '../../hooks/useGameLoop';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { Renderer } from '../../engine/Renderer';
 import { updatePhysics, checkLavaCollision, moveCharacter, jump } from '../../engine/PhysicsEngine';
-import { checkSwordHit } from '../../engine/CollisionDetection';
+import { checkSwordHit, getSwordHitbox } from '../../engine/CollisionDetection';
 import { EnemyAI } from '../../ai/EnemyAI';
 import { DIFFICULTY_SETTINGS } from '../../ai/DifficultySettings';
 import { CANVAS, GAME, PHYSICS } from '../../utils/constants';
-import { createHitParticles, createHealParticles, createLavaBubble, updateParticles } from '../../utils/helpers';
+import { createHitParticles, createHealParticles, createLavaBubble, updateParticles, createFloatingText, updateFloatingTexts, createSwordTrail } from '../../utils/helpers';
 import { GameHUD } from '../UI/GameHUD';
 
 export function GameCanvas() {
@@ -19,6 +19,7 @@ export function GameCanvas() {
   const lastSaveRef = useRef(Date.now());
   const fpsRef = useRef(60);
   const lastFpsUpdate = useRef(Date.now());
+  const lastComboHitRef = useRef(Date.now());
 
   // Initialize AI
   useEffect(() => {
@@ -102,20 +103,42 @@ export function GameCanvas() {
     if (player.isAttacking && checkSwordHit(player, enemy)) {
       let damage = player.equippedSword.damage;
 
+      // Apply combo bonus
+      const comboMultiplier = Math.min(1 + (state.combo * GAME.COMBO_DAMAGE_MULTIPLIER), GAME.MAX_COMBO_MULTIPLIER);
+      damage *= comboMultiplier;
+
       // Apply damage boost if active
       const damageBoost = player.activeEffects.find(e => e.type === 'damage_boost');
       if (damageBoost) {
         damage *= damageBoost.value;
       }
 
+      damage = Math.round(damage);
+
+      lastComboHitRef.current = Date.now();
+      dispatch({ type: 'INCREMENT_COMBO' });
       dispatch({ type: 'DAMAGE_ENEMY', amount: damage });
+      dispatch({ type: 'TRACK_DAMAGE', amount: damage, target: 'enemy' });
       dispatch({ type: 'APPLY_KNOCKBACK', target: 'enemy', direction: player.facing, force: PHYSICS.KNOCKBACK_FORCE });
       dispatch({ type: 'ADD_PARTICLES', particles: createHitParticles(enemy.position.x + enemy.width / 2, enemy.position.y + enemy.height / 2) });
+      dispatch({ type: 'ADD_FLOATING_TEXT', text: createFloatingText(enemy.position.x + enemy.width / 2, enemy.position.y, `-${damage}`, '#FF4500', 24) });
+      dispatch({ type: 'TRIGGER_SCREEN_SHAKE' });
+
+      // Add sword trail particles
+      const swordBox = getSwordHitbox(player);
+      dispatch({ type: 'ADD_PARTICLES', particles: createSwordTrail(swordBox.x, swordBox.y, swordBox.width, swordBox.height) });
+    }
+
+    // Check combo timeout
+    if (state.combo > 0 && Date.now() - lastComboHitRef.current > GAME.COMBO_TIMEOUT) {
+      dispatch({ type: 'RESET_COMBO' });
     }
 
     if (enemy.isAttacking && checkSwordHit(enemy, player)) {
       const damage = enemy.equippedSword.damage;
       dispatch({ type: 'DAMAGE_PLAYER', amount: damage });
+      dispatch({ type: 'TRACK_DAMAGE', amount: damage, target: 'player' });
+      dispatch({ type: 'RESET_COMBO' }); // Reset combo when hit
       dispatch({ type: 'APPLY_KNOCKBACK', target: 'player', direction: enemy.facing, force: PHYSICS.KNOCKBACK_FORCE });
       dispatch({ type: 'ADD_PARTICLES', particles: createHitParticles(player.position.x + player.width / 2, player.position.y + player.height / 2) });
     }
@@ -168,6 +191,13 @@ export function GameCanvas() {
     const updatedParticles = updateParticles(state.particles, deltaTime);
     dispatch({ type: 'UPDATE_PARTICLES', particles: updatedParticles });
 
+    // Update floating texts
+    const updatedTexts = updateFloatingTexts(state.floatingTexts, deltaTime);
+    dispatch({ type: 'UPDATE_FLOATING_TEXTS', texts: updatedTexts });
+
+    // Update screen shake
+    dispatch({ type: 'UPDATE_SCREEN_SHAKE', deltaTime });
+
     // Update characters in state
     dispatch({ type: 'SET_PLAYER', player });
     dispatch({ type: 'SET_ENEMY', enemy });
@@ -193,6 +223,14 @@ export function GameCanvas() {
     const renderer = new Renderer(ctx);
 
     const render = () => {
+      // Apply screen shake
+      if (state.screenShake > 0) {
+        const shakeX = (Math.random() - 0.5) * state.screenShake;
+        const shakeY = (Math.random() - 0.5) * state.screenShake;
+        ctx.save();
+        ctx.translate(shakeX, shakeY);
+      }
+
       renderer.clear();
       renderer.renderBackground();
       renderer.renderLava();
@@ -200,14 +238,22 @@ export function GameCanvas() {
       renderer.renderCharacter(state.player);
       renderer.renderCharacter(state.enemy);
       renderer.renderParticles(state.particles);
+      renderer.renderFloatingTexts(state.floatingTexts);
+      renderer.renderComboIndicator(state.combo);
+      renderer.renderWinStreak(state.winStreak);
 
       if (state.settings.showFPS && aiRef.current) {
         renderer.renderDebug(
           fpsRef.current,
           state.player.state,
           state.enemy.state,
-          aiRef.current.getStrategy()
+          aiRef.current.getStrategy(),
+          state.combo
         );
+      }
+
+      if (state.screenShake > 0) {
+        ctx.restore();
       }
 
       requestAnimationFrame(render);

@@ -6,7 +6,7 @@ import { INITIAL_STATE, createCharacter } from '../data/initialState';
 import { saveManager } from '../services/SaveManager';
 import { SWORDS } from '../data/swords';
 import { ABILITIES } from '../data/abilities';
-import { GAME } from '../utils/constants';
+import { GAME, DIFFICULTY_BONUSES } from '../utils/constants';
 import { applyKnockback } from '../engine/PhysicsEngine';
 
 const GameContext = createContext<GameContextValue | undefined>(undefined);
@@ -32,6 +32,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         gameTime: 0,
         winner: null,
         particles: [],
+        combo: 0,
+        floatingTexts: [],
+        screenShake: 0,
       };
     }
 
@@ -106,7 +109,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'GAME_OVER': {
       const isPlayerWinner = action.winner === 'player';
-      const coinsEarned = isPlayerWinner ? GAME.COINS_PER_WIN : 0;
+      const baseCoins = DIFFICULTY_BONUSES[state.difficulty] || GAME.COINS_PER_WIN;
+      const coinsEarned = isPlayerWinner ? baseCoins : 0;
+      const isPerfect = isPlayerWinner && state.player.health === state.player.maxHealth;
+      const newWinStreak = isPlayerWinner ? state.winStreak + 1 : 0;
 
       return {
         ...state,
@@ -116,6 +122,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         totalCoins: state.totalCoins + coinsEarned,
         wins: isPlayerWinner ? state.wins + 1 : state.wins,
         losses: !isPlayerWinner ? state.losses + 1 : state.losses,
+        winStreak: newWinStreak,
+        maxWinStreak: Math.max(state.maxWinStreak, newWinStreak),
+        perfectWins: isPerfect ? state.perfectWins + 1 : state.perfectWins,
       };
     }
 
@@ -197,6 +206,90 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         gameTime: state.gameTime + action.deltaTime,
       };
 
+    case 'ADD_PARTICLES':
+      return {
+        ...state,
+        particles: [...state.particles, ...action.particles].slice(-GAME.MAX_PARTICLES),
+      };
+
+    case 'UPDATE_PARTICLES':
+      return {
+        ...state,
+        particles: action.particles,
+      };
+
+    case 'APPLY_KNOCKBACK': {
+      const target = action.target === 'player' ? state.player : state.enemy;
+      applyKnockback(target, action.direction, action.force);
+      return action.target === 'player'
+        ? { ...state, player: { ...target } }
+        : { ...state, enemy: { ...target } };
+    }
+
+    case 'OPEN_STATS':
+      return { ...state, status: 'stats' };
+
+    case 'CLOSE_STATS':
+      return { ...state, status: 'menu' };
+
+    case 'ADD_FLOATING_TEXT':
+      return {
+        ...state,
+        floatingTexts: [...state.floatingTexts, action.text],
+      };
+
+    case 'UPDATE_FLOATING_TEXTS':
+      return {
+        ...state,
+        floatingTexts: action.texts,
+      };
+
+    case 'INCREMENT_COMBO':
+      return {
+        ...state,
+        combo: state.combo + 1,
+        maxCombo: Math.max(state.maxCombo, state.combo + 1),
+      };
+
+    case 'RESET_COMBO':
+      return {
+        ...state,
+        combo: 0,
+      };
+
+    case 'TRIGGER_SCREEN_SHAKE':
+      return {
+        ...state,
+        screenShake: action.intensity || GAME.SCREEN_SHAKE_INTENSITY,
+      };
+
+    case 'UPDATE_SCREEN_SHAKE': {
+      const newShake = Math.max(0, state.screenShake - action.deltaTime * GAME.SCREEN_SHAKE_INTENSITY * 10);
+      return {
+        ...state,
+        screenShake: newShake,
+      };
+    }
+
+    case 'HIDE_TUTORIAL':
+      return {
+        ...state,
+        showTutorial: false,
+      };
+
+    case 'TRACK_DAMAGE':
+      if (action.target === 'player') {
+        return {
+          ...state,
+          totalDamageTaken: state.totalDamageTaken + action.amount,
+        };
+      } else {
+        return {
+          ...state,
+          totalDamageDealt: state.totalDamageDealt + action.amount,
+        };
+      }
+
     case 'LOAD_SAVE': {
       const { data } = action;
 
@@ -223,32 +316,18 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         swords,
         abilities,
         settings: data.settings,
+        maxCombo: data.maxCombo || 0,
+        maxWinStreak: data.maxWinStreak || 0,
+        totalDamageDealt: data.totalDamageDealt || 0,
+        totalDamageTaken: data.totalDamageTaken || 0,
+        perfectWins: data.perfectWins || 0,
+        showTutorial: data.showTutorial !== false,
         player: {
           ...state.player,
           equippedSword,
           abilities: equippedAbilities,
         },
       };
-    }
-
-    case 'ADD_PARTICLES':
-      return {
-        ...state,
-        particles: [...state.particles, ...action.particles].slice(-GAME.MAX_PARTICLES),
-      };
-
-    case 'UPDATE_PARTICLES':
-      return {
-        ...state,
-        particles: action.particles,
-      };
-
-    case 'APPLY_KNOCKBACK': {
-      const target = action.target === 'player' ? state.player : state.enemy;
-      applyKnockback(target, action.direction, action.force);
-      return action.target === 'player'
-        ? { ...state, player: { ...target } }
-        : { ...state, enemy: { ...target } };
     }
 
     default:

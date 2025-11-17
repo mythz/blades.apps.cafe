@@ -18,6 +18,8 @@ export type GameAction =
   | { type: 'RESUME_GAME' }
   | { type: 'OPEN_SHOP' }
   | { type: 'CLOSE_SHOP' }
+  | { type: 'OPEN_STATS' }
+  | { type: 'CLOSE_STATS' }
   | { type: 'BACK_TO_MENU' }
   | { type: 'UPDATE_SETTINGS'; settings: Partial<GameSettings> }
   | { type: 'TICK'; deltaTime: number }
@@ -26,4 +28,12 @@ export type GameAction =
   | { type: 'SET_ENEMY'; enemy: Character }
   | { type: 'ADD_PARTICLES'; particles: import('../types/game').Particle[] }
   | { type: 'UPDATE_PARTICLES'; particles: import('../types/game').Particle[] }
-  | { type: 'APPLY_KNOCKBACK'; target: 'player' | 'enemy'; direction: 'left' | 'right'; force: number };
+  | { type: 'APPLY_KNOCKBACK'; target: 'player' | 'enemy'; direction: 'left' | 'right'; force: number }
+  | { type: 'ADD_FLOATING_TEXT'; text: import('../types/game').FloatingText }
+  | { type: 'UPDATE_FLOATING_TEXTS'; texts: import('../types/game').FloatingText[] }
+  | { type: 'INCREMENT_COMBO' }
+  | { type: 'RESET_COMBO' }
+  | { type: 'TRIGGER_SCREEN_SHAKE'; intensity?: number }
+  | { type: 'UPDATE_SCREEN_SHAKE'; deltaTime: number }
+  | { type: 'HIDE_TUTORIAL' }
+  | { type: 'TRACK_DAMAGE'; amount: number; target: 'player' | 'enemy' };

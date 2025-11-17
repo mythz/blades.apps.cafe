@@ -22,6 +22,12 @@ class SaveManager {
       equippedAbilities: state.player.abilities.map(a => a.id),
       settings: state.settings,
       lastPlayed: now,
+      maxCombo: state.maxCombo,
+      maxWinStreak: state.maxWinStreak,
+      totalDamageDealt: state.totalDamageDealt,
+      totalDamageTaken: state.totalDamageTaken,
+      perfectWins: state.perfectWins,
+      showTutorial: state.showTutorial,
     };
 
     await storageService.saveGame(saveData);
@@ -52,6 +58,12 @@ class SaveManager {
       equippedAbilities: state.player.abilities.map(a => a.id),
       settings: state.settings,
       lastPlayed: Date.now(),
+      maxCombo: state.maxCombo,
+      maxWinStreak: state.maxWinStreak,
+      totalDamageDealt: state.totalDamageDealt,
+      totalDamageTaken: state.totalDamageTaken,
+      perfectWins: state.perfectWins,
+      showTutorial: state.showTutorial,
     };
 
     const dataStr = JSON.stringify(saveData, null, 2);

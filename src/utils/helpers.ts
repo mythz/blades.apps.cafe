@@ -1,4 +1,4 @@
-import { Vector2D, Particle } from '../types/game';
+import { Vector2D, Particle, FloatingText } from '../types/game';
 
 // Linear interpolation
 export function lerp(start: number, end: number, factor: number): number {
@@ -121,6 +121,49 @@ export function createLavaBubble(x: number): Particle {
   };
 }
 
+// Create sword trail particles
+export function createSwordTrail(x: number, y: number, width: number, height: number): Particle[] {
+  const particles: Particle[] = [];
+  const count = randomInt(3, 5);
+
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      id: generateId('particle'),
+      x: x + random(0, width),
+      y: y + random(0, height),
+      vx: random(-1, 1),
+      vy: random(-1, 1),
+      life: 0,
+      maxLife: random(0.2, 0.4),
+      size: random(2, 4),
+      color: '#FFD700',
+      type: 'sword_trail',
+    });
+  }
+
+  return particles;
+}
+
+// Create floating text (damage numbers, combo, etc.)
+export function createFloatingText(
+  x: number,
+  y: number,
+  text: string,
+  color: string = '#FFFFFF',
+  fontSize: number = 20
+): FloatingText {
+  return {
+    id: generateId('text'),
+    x,
+    y,
+    text,
+    color,
+    life: 0,
+    maxLife: 1.5,
+    fontSize,
+  };
+}
+
 // Update particles
 export function updateParticles(particles: Particle[], deltaTime: number): Particle[] {
   return particles
@@ -133,4 +176,15 @@ export function updateParticles(particles: Particle[], deltaTime: number): Parti
       size: Math.max(0, particle.size * (1 - particle.life / particle.maxLife)),
     }))
     .filter(particle => particle.life < particle.maxLife && particle.size > 0);
+}
+
+// Update floating texts
+export function updateFloatingTexts(texts: FloatingText[], deltaTime: number): FloatingText[] {
+  return texts
+    .map(text => ({
+      ...text,
+      y: text.y - 30 * deltaTime, // Float upward
+      life: text.life + deltaTime,
+    }))
+    .filter(text => text.life < text.maxLife);
 }

@@ -216,9 +216,68 @@ export class Renderer {
     this.ctx.fillText(`Difficulty: ${state.difficulty.toUpperCase()}`, CANVAS.WIDTH / 2, 75);
   }
 
-  renderDebug(fps: number, playerState: string, enemyState: string, aiStrategy: string): void {
+  renderFloatingTexts(texts: import('../types/game').FloatingText[]): void {
+    for (const text of texts) {
+      const alpha = 1 - text.life / text.maxLife;
+      this.ctx.globalAlpha = alpha;
+      this.ctx.fillStyle = text.color;
+      this.ctx.font = `bold ${text.fontSize}px Arial`;
+      this.ctx.textAlign = 'center';
+      this.ctx.strokeStyle = '#000000';
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeText(text.text, text.x, text.y);
+      this.ctx.fillText(text.text, text.x, text.y);
+    }
+    this.ctx.globalAlpha = 1;
+  }
+
+  renderComboIndicator(combo: number): void {
+    if (combo <= 1) return;
+
+    const x = CANVAS.WIDTH - 100;
+    const y = 100;
+
+    // Combo background
+    this.ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+    this.ctx.fillRect(x - 50, y - 30, 100, 50);
+    this.ctx.strokeStyle = '#FFD700';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(x - 50, y - 30, 100, 50);
+
+    // Combo text
+    this.ctx.fillStyle = '#FFD700';
+    this.ctx.font = 'bold 24px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(`${combo}x`, x, y - 10);
+    this.ctx.font = '12px Arial';
+    this.ctx.fillText('COMBO', x, y + 10);
+  }
+
+  renderWinStreak(winStreak: number): void {
+    if (winStreak <= 0) return;
+
+    const x = 100;
+    const y = 100;
+
+    // Streak background
+    this.ctx.fillStyle = 'rgba(255, 100, 100, 0.2)';
+    this.ctx.fillRect(x - 50, y - 30, 100, 50);
+    this.ctx.strokeStyle = '#FF6B6B';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(x - 50, y - 30, 100, 50);
+
+    // Streak text
+    this.ctx.fillStyle = '#FF6B6B';
+    this.ctx.font = 'bold 20px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(`${winStreak} Win`, x, y - 5);
+    this.ctx.font = '12px Arial';
+    this.ctx.fillText('STREAK', x, y + 12);
+  }
+
+  renderDebug(fps: number, playerState: string, enemyState: string, aiStrategy: string, combo: number): void {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    this.ctx.fillRect(10, 100, 200, 120);
+    this.ctx.fillRect(10, 100, 200, 140);
 
     this.ctx.fillStyle = '#00FF00';
     this.ctx.font = '12px monospace';
@@ -227,5 +286,6 @@ export class Renderer {
     this.ctx.fillText(`Player: ${playerState}`, 20, 140);
     this.ctx.fillText(`Enemy: ${enemyState}`, 20, 160);
     this.ctx.fillText(`AI: ${aiStrategy}`, 20, 180);
+    this.ctx.fillText(`Combo: ${combo}x`, 20, 200);
   }
 }

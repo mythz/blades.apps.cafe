@@ -6,6 +6,8 @@ import { GameCanvas } from './components/Game/GameCanvas';
 import { PauseMenu } from './components/UI/PauseMenu';
 import { GameOverScreen } from './components/UI/GameOverScreen';
 import { ShopModal } from './components/UI/ShopModal';
+import { StatsScreen } from './components/UI/StatsScreen';
+import { TutorialOverlay } from './components/UI/TutorialOverlay';
 
 function GameContent() {
   const { state, loadGame } = useGameContext();
@@ -22,9 +24,11 @@ function GameContent() {
     <div className="app">
       {state.status === 'menu' && <MainMenu />}
       {state.status === 'shop' && <ShopModal />}
+      {state.status === 'stats' && <StatsScreen />}
       {(state.status === 'playing' || state.status === 'paused') && <GameCanvas />}
       {state.status === 'paused' && <PauseMenu />}
       {state.status === 'gameover' && <GameOverScreen />}
+      <TutorialOverlay />
     </div>
   );
 }

@@ -25,7 +25,20 @@ export const GAME = {
   COINS_PER_WIN: 50,
   MAX_PARTICLES: 200,
   AUTO_SAVE_INTERVAL: 30000, // 30 seconds
+  COMBO_TIMEOUT: 3000, // Combo resets after 3 seconds
+  COMBO_DAMAGE_MULTIPLIER: 0.1, // 10% bonus per combo hit
+  MAX_COMBO_MULTIPLIER: 2.0, // Max 200% damage
+  SCREEN_SHAKE_DURATION: 200, // ms
+  SCREEN_SHAKE_INTENSITY: 5, // pixels
 } as const;
+
+// Difficulty coin bonuses
+export const DIFFICULTY_BONUSES: Record<string, number> = {
+  easy: 50,
+  medium: 75,
+  hard: 100,
+  insane: 150,
+};
 
 // Control mappings
 export const CONTROLS = {

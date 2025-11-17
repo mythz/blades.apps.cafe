@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGameContext } from '../../store/GameContext';
 import { Difficulty } from '../../types/game';
+import { DIFFICULTY_BONUSES } from '../../utils/constants';
 
 export function MainMenu() {
   const { state, dispatch } = useGameContext();
@@ -17,16 +18,16 @@ export function MainMenu() {
         <h1 className="game-title">Select Difficulty</h1>
         <div className="menu-buttons">
           <button onClick={() => handleStartGame('easy')} className="menu-button">
-            Easy
+            Easy <span className="coin-bonus">({DIFFICULTY_BONUSES.easy} coins)</span>
           </button>
           <button onClick={() => handleStartGame('medium')} className="menu-button">
-            Medium
+            Medium <span className="coin-bonus">({DIFFICULTY_BONUSES.medium} coins)</span>
           </button>
           <button onClick={() => handleStartGame('hard')} className="menu-button">
-            Hard
+            Hard <span className="coin-bonus">({DIFFICULTY_BONUSES.hard} coins)</span>
           </button>
           <button onClick={() => handleStartGame('insane')} className="menu-button">
-            Insane
+            Insane <span className="coin-bonus">({DIFFICULTY_BONUSES.insane} coins)</span>
           </button>
           <button onClick={() => setShowDifficultySelect(false)} className="menu-button secondary">
             Back
@@ -46,12 +47,13 @@ export function MainMenu() {
         <button onClick={() => dispatch({ type: 'OPEN_SHOP' })} className="menu-button">
           Shop
         </button>
-        <button className="menu-button disabled" disabled>
-          Settings
+        <button onClick={() => dispatch({ type: 'OPEN_STATS' })} className="menu-button">
+          Statistics
         </button>
       </div>
       <div className="stats-display">
         <p>Coins: {state.coins} | Wins: {state.wins} | Losses: {state.losses}</p>
+        {state.winStreak > 0 && <p className="win-streak-indicator">🔥 {state.winStreak} Win Streak!</p>}
       </div>
     </div>
   );

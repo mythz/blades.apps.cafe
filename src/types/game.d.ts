@@ -104,7 +104,7 @@ export interface GameSettings {
 
 // Game state
 export interface GameState {
-  status: 'menu' | 'playing' | 'paused' | 'gameover' | 'shop';
+  status: 'menu' | 'playing' | 'paused' | 'gameover' | 'shop' | 'stats';
   difficulty: Difficulty;
   player: Character;
   enemy: Character;
@@ -119,6 +119,16 @@ export interface GameState {
   settings: GameSettings;
   particles: Particle[];
   winner: 'player' | 'enemy' | null;
+  combo: number;
+  maxCombo: number;
+  winStreak: number;
+  maxWinStreak: number;
+  floatingTexts: FloatingText[];
+  screenShake: number;
+  totalDamageDealt: number;
+  totalDamageTaken: number;
+  perfectWins: number;
+  showTutorial: boolean;
 }
 
 // Save data structure
@@ -133,6 +143,12 @@ export interface SaveData {
   equippedAbilities: string[];
   settings: GameSettings;
   lastPlayed: number;
+  maxCombo: number;
+  maxWinStreak: number;
+  totalDamageDealt: number;
+  totalDamageTaken: number;
+  perfectWins: number;
+  showTutorial: boolean;
 }
 
 // Particle system
@@ -146,7 +162,19 @@ export interface Particle {
   maxLife: number;
   size: number;
   color: string;
-  type: 'hit' | 'heal' | 'lava_bubble' | 'dust';
+  type: 'hit' | 'heal' | 'lava_bubble' | 'dust' | 'sword_trail';
+}
+
+// Floating text (damage numbers, etc.)
+export interface FloatingText {
+  id: string;
+  x: number;
+  y: number;
+  text: string;
+  color: string;
+  life: number;
+  maxLife: number;
+  fontSize: number;
 }
 
 // Collision result
